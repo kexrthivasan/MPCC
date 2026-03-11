@@ -1,7 +1,7 @@
-#include "Server.h"
-#include "ClientHandler.h"
-#include "Session.h"
-#include "../common/Logger.h"
+#include "server/Server.h"
+#include "server/ClientHandler.h"
+#include "server/Session.h"
+#include "common/Logger.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -72,3 +72,4 @@ void Server::start() {
         pthread_detach(thread_id);
     }
 }
+

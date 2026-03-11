@@ -1,5 +1,5 @@
-#include "BroadcastManager.h"
-#include "../common/Logger.h"
+#include "server/BroadcastManager.h"
+#include "common/Logger.h"
 #include <sys/socket.h>
 #include <algorithm>
 #include <iostream>
@@ -46,3 +46,4 @@ void BroadcastManager::broadcast(const std::string& message, Session* sender) {
     }
     pthread_mutex_unlock(&m_mutex);
 }
+

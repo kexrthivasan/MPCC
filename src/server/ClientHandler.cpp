@@ -1,10 +1,10 @@
-#include "ClientHandler.h"
-#include "Session.h"
-#include "UserRegistry.h"
-#include "BroadcastManager.h"
-#include "../common/Message.h"
-#include "../common/Cipher.h"
-#include "../common/Logger.h"
+#include "server/ClientHandler.h"
+#include "server/Session.h"
+#include "server/UserRegistry.h"
+#include "server/BroadcastManager.h"
+#include "common/Message.h"
+#include "common/Cipher.h"
+#include "common/Logger.h"
 #include <sys/socket.h>
 #include <unistd.h>
 #include <cstring>
@@ -129,3 +129,6 @@ void* handleClient(void* arg) {
     delete session;
     return NULL;
 }
+
+
+

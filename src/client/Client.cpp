@@ -1,7 +1,7 @@
-#include "Client.h"
-#include "../common/Message.h"
-#include "../common/Cipher.h"
-#include "../common/Logger.h"
+#include "client/Client.h"
+#include "common/Message.h"
+#include "common/Cipher.h"
+#include "common/Logger.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -178,3 +178,6 @@ void Client::chatLoop() {
     // Wait for receive thread to exit
     pthread_join(recv_thread, NULL);
 }
+
+
+

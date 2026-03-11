@@ -1,6 +1,6 @@
-#include "UserRegistry.h"
-#include "../common/Cipher.h"
-#include "../common/Logger.h"
+#include "server/UserRegistry.h"
+#include "common/Cipher.h"
+#include "common/Logger.h"
 #include <fstream>
 #include <iostream>
 
@@ -91,3 +91,4 @@ bool UserRegistry::authenticateUser(const std::string& username, const std::stri
     pthread_mutex_unlock(&m_mutex);
     return authenticated;
 }
+

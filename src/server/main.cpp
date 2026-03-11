@@ -1,5 +1,5 @@
-#include "Server.h"
-#include "../common/Logger.h"
+#include "server/Server.h"
+#include "common/Logger.h"
 
 int main() {
     LOG_INFO("Starting MPCC Server...");
@@ -7,3 +7,4 @@ int main() {
     server.start();
     return 0;
 }
+
