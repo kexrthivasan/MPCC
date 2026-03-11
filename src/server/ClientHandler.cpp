@@ -36,16 +36,17 @@ void* handleClient(void* arg) {
 
         switch (type) {
             case REGISTER: {
-                // payload format: encrypted_username:encrypted_password
+                // The received payload format from the client is: encrypted_username:encrypted_password
                 size_t delim = payload.find(':');
                 if (delim != std::string::npos) {
                     std::string user = payload.substr(0, delim);
                     std::string pass = payload.substr(delim + 1);
                     
-                    // Decrypt credentials
+                    // XOR Decrypt credentials to use them for registration
                     user = Cipher::process(user);
                     pass = Cipher::process(pass);
                     
+                    // Hand off to UserRegistry for persistent storage of credentials
                     if (UserRegistry::getInstance().registerUser(user, pass)) {
                         LOG_INFO("User registered successfully: " + user);
                         std::string resp = Message::serialize(SYSTEM, Cipher::process("Registration successful. You can login now."));

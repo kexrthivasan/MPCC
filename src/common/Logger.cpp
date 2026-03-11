@@ -41,11 +41,13 @@ void Logger::log(LogLevel level, const std::string& message) {
     
     std::string logMsg = std::string("[") + buffer + "] [" + levelToString(level) + "] " + message;
     
-    // Writes logs to console
+    // Writes logs to console (flushed immediately)
     std::cout << logMsg << std::endl;
+    std::cout.flush();
     // Writes logs to mpcc_server.log
     if (m_logFile.is_open()) {
         m_logFile << logMsg << std::endl;
+        m_logFile.flush();
     }
     
     pthread_mutex_unlock(&m_mutex);

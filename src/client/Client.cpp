@@ -3,6 +3,7 @@
 #include "common/Cipher.h"
 #include "common/Logger.h"
 #include <sys/socket.h>
+#include <netdb.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <iostream>
@@ -26,21 +27,31 @@ void Client::start() {
         return;
     }
 
-    struct sockaddr_in server_addr;
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(m_port);
+    // Use getaddrinfo to resolve hostname or IP address
+    struct addrinfo hints, *res;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family   = AF_INET;      // IPv4
+    hints.ai_socktype = SOCK_STREAM;  // TCP
 
-    if (inet_pton(AF_INET, m_server_ip.c_str(), &server_addr.sin_addr) <= 0) {
-        LOG_FATAL("Invalid address / Address not supported");
+    std::string port_str = std::to_string(m_port);
+    int status = getaddrinfo(m_server_ip.c_str(), port_str.c_str(), &hints, &res);
+    if (status != 0) {
+        LOG_FATAL(std::string("Could not resolve host: ") + gai_strerror(status));
+        close(m_client_fd);
+        m_client_fd = -1;
         return;
     }
 
-    if (connect(m_client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+    // Connect using the resolved address
+    if (connect(m_client_fd, res->ai_addr, res->ai_addrlen) < 0) {
         LOG_FATAL("Connection Failed");
+        freeaddrinfo(res);
+        close(m_client_fd);
+        m_client_fd = -1;
         return;
     }
 
+    freeaddrinfo(res);
     m_connected = true;
     displayMenu();
 }
@@ -122,12 +133,17 @@ void Client::loginUser() {
     }
 }
 
+// Thread function specifically running to constantly check for incoming broadcast messages 
+// so the CLI doesn't block while waiting for user input via standard in (std::cin).
 void* Client::receiveThread(void* arg) {
     Client* client = static_cast<Client*>(arg);
     char buffer[1024];
 
     while (client->m_connected) {
         memset(buffer, 0, sizeof(buffer));
+        
+        // Blocking socket receive call. Will hold execution of this specific thread 
+        // until the MPCC server sends a payload or closes the socket.
         int bytes_read = recv(client->m_client_fd, buffer, sizeof(buffer) - 1, 0);
         
         if (bytes_read <= 0) {
@@ -138,6 +154,7 @@ void* Client::receiveThread(void* arg) {
 
         int type;
         std::string payload;
+        // The message type could be SYSTEM (like join/leave) or CHAT (user messages)
         if (Message::parse(std::string(buffer), type, payload)) {
             if (type == CHAT) {
                 std::cout << "\n" << Cipher::process(payload) << "\n";
