@@ -4,14 +4,15 @@ LDFLAGS = -pthread
 
 all: mpcc_server mpcc_client
 
-mpcc_server: server/main.o server/Server.o server/ClientHandler.o server/BroadcastManager.o server/UserRegistry.o common/Logger.o
+mpcc_server: src/server/main.o src/server/Server.o src/server/ClientHandler.o src/server/BroadcastManager.o src/server/UserRegistry.o src/common/Logger.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-mpcc_client: client/main.o client/Client.o common/Logger.o
+mpcc_client: src/client/main.o src/client/Client.o src/common/Logger.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -Iinclude -c -o $@ $<
 
 clean:
-	rm -f mpcc_server mpcc_client server/*.o client/*.o common/*.o
+	rm -f mpcc_server mpcc_client src/server/*.o src/client/*.o src/common/*.o
+
